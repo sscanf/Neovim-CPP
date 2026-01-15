@@ -19,6 +19,13 @@ return {
     -- Configure CMake tools with parallel builds
     require("cmake-tools").setup({
       cmake_build_args = { "-j", tostring(vim.loop.cpu_info() and #vim.loop.cpu_info() or 4) },
+      cmake_executor = {
+        name = "quickfix",
+        opts = {
+          position = "botright", -- Abre ocupando todo el ancho inferior
+          size = 10,
+        },
+      },
     })
 
     -- Create CMakeDeploy command

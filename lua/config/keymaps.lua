@@ -33,12 +33,30 @@ vim.api.nvim_set_keymap("n", "<A-t>", ':lua require("dap.repl").open()<CR>', { n
 
 vim.keymap.set("n", "<A-D>", ":CMakeDeploy<CR>", { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap(
-  "n",
-  "<F4>",
-  ":ClangdSwitchSourceHeader<CR>",
-  { noremap = true, silent = true, desc = "Switch between source and header" }
-)
+vim.keymap.set("n", "<F4>", function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local win = vim.api.nvim_get_current_win()
+  local params = { uri = vim.uri_from_bufnr(bufnr) }
+  local clients = vim.lsp.get_clients({ bufnr = bufnr, name = "clangd" })
+  if #clients == 0 then
+    vim.notify("clangd no está activo", vim.log.levels.WARN)
+    return
+  end
+  clients[1]:request("textDocument/switchSourceHeader", params, function(err, result)
+    if err or not result or result == "" then
+      vim.notify("No se encontró archivo alternativo", vim.log.levels.WARN)
+      return
+    end
+    local fname = vim.uri_to_fname(result)
+    vim.schedule(function()
+      -- Crear/obtener el buffer
+      local target_buf = vim.fn.bufadd(fname)
+      vim.fn.bufload(target_buf)
+      -- Usar :b que es el comando estándar para cambiar buffers
+      vim.cmd("b " .. target_buf)
+    end)
+  end, bufnr)
+end, { desc = "Switch between source and header (same buffer)" })
 
 vim.keymap.set("n", "<leader>bA", function()
   local pos = vim.api.nvim_win_get_cursor(0) -- Guarda la posición del cursor
