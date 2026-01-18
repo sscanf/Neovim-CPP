@@ -1792,9 +1792,16 @@ local function create_gdbserver_script(script_file, gdb_port, rprog, args)
   -- Remover trailing slash si existe (LD_LIBRARY_PATH no lo necesita)
   plugin_path = plugin_path:gsub("/$", "")
 
+  -- Leer variables de entorno adicionales desde CMakeCache.txt (DEBUG_ENV)
+  local debug_env = get_cmake_cache_var("DEBUG_ENV") or ""
+  if debug_env ~= "" then
+    debug_env = debug_env .. " "
+  end
+
   -- Usar 'env' en lugar de 'export' porque stdbuf solo puede ejecutar comandos externos
   local gdb_command = string.format(
-    "env LD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH gdbserver :%s %s %s",
+    "env %sLD_LIBRARY_PATH=%s:$LD_LIBRARY_PATH gdbserver :%s %s %s",
+    debug_env,
     plugin_path,
     gdb_port,
     rprog,

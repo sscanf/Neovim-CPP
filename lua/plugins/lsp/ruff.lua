@@ -17,6 +17,9 @@ return {
   opts = function(_, opts)
     opts.servers = opts.servers or {}
     opts.servers.ruff = {
+      -- Use system ruff instead of Mason (ARM64 compatibility)
+      mason = false,
+      cmd = { "ruff", "server" },
       init_options = {
         settings = {
           args = {

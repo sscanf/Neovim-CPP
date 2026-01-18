@@ -55,8 +55,16 @@ return {
         end
 
         local excluded = {
-          "help", "alpha", "dashboard", "neo-tree", "Trouble",
-          "lazy", "mason", "notify", "toggleterm", "lazyterm"
+          "help",
+          "alpha",
+          "dashboard",
+          "neo-tree",
+          "Trouble",
+          "lazy",
+          "mason",
+          "notify",
+          "toggleterm",
+          "lazyterm",
         }
 
         for _, ft in ipairs(excluded) do
