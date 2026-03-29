@@ -149,7 +149,13 @@ local function get_cmake_cache_var(var_name)
     end
 
     buf = vim.fn.bufadd(cache_path)
-    vim.fn.bufload(buf)
+    -- Suppress E325 swap file warnings when loading programmatically
+    local ok, err = pcall(function()
+      vim.cmd("silent! noswapfile call bufload(" .. buf .. ")")
+    end)
+    if not ok then
+      debug_log("⚠️ bufload warning (likely swap file): " .. tostring(err), vim.log.levels.WARN)
+    end
   end
 
   if not buf then
@@ -183,7 +189,8 @@ local function get_cmake_cache_var(var_name)
   for _, line in ipairs(lines) do
     -- El formato de CMakeCache.txt es: VARIABLE:TYPE=value
     -- donde TYPE puede ser: UNINITIALIZED, STRING, FILEPATH, PATH, BOOL, INTERNAL, etc.
-    local var, var_type, value = line:match("^([%w_]+):([%w_]+)=(.+)$")
+    -- Nota: usamos [%w_%-]+ para incluir guiones en nombres de variables (ej: d2base-emulator_BINARY_DIR)
+    local var, var_type, value = line:match("^([%w_%-]+):([%w_]+)=(.+)$")
     if var == var_name then
       -- Debug: show the found variable
       debug_log(string.format("✅ Found %s:%s=%s", var_name, var_type, value), vim.log.levels.INFO)
@@ -289,7 +296,7 @@ local function open_deploy_console()
   end
 
   -- Abrir ventana en la parte inferior (solo si no existe)
-  vim.cmd("botright 15split")
+  vim.cmd("botright 20split")
   deploy_log_window = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_buf(deploy_log_window, deploy_log_buffer)
 
@@ -584,7 +591,7 @@ function BufferManager.create_output_buffer()
 end
 
 function BufferManager.open_in_split(buf)
-  vim.cmd("botright 15split")
+  vim.cmd("botright 20split")
   local win = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_buf(win, buf)
   vim.cmd("wincmd p")

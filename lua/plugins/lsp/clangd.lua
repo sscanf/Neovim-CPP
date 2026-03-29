@@ -9,7 +9,7 @@
 return {
   -- Disable Mason installation for clangd
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = {
       ensure_installed = vim.tbl_filter(function(tool)
         return tool ~= "clangd"

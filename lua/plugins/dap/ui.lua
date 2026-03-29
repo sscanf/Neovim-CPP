@@ -4,15 +4,11 @@ DAP UI (DEBUG INTERFACE)
 ================================================================================
 Provides a comprehensive UI for nvim-dap debugging sessions.
 Layout configuration:
-  Right panel (40 cols):
-    - Scopes (35%)
-    - Locals (35%)
-    - Watches (30%)
-  Bottom panel (10 rows):
-    - REPL (50%)
-    - Console (20%)
-    - Breakpoints (10%)
-    - Stacks (20%)
+  Right panel (50 cols):
+    - Scopes (35%) - Variables in current scope
+    - Watches (25%) - Custom watch expressions
+    - Stacks (20%) - Call stack for navigation
+    - Console (20%) - DAP messages
 Features:
   - Auto-open on debug session start
   - Auto-close on debug session end
@@ -31,21 +27,12 @@ local default_layouts = {
   {
     elements = {
       { id = "scopes", size = 0.35 },
-      { id = "locals", size = 0.35 },
-      { id = "watches", size = 0.3 },
-    },
-    size = 40,
-    position = "right",
-  },
-  {
-    elements = {
-      { id = "repl", size = 0.5 },
-      { id = "console", size = 0.2 },
-      { id = "breakpoints", size = 0.1 },
+      { id = "watches", size = 0.25 },
       { id = "stacks", size = 0.2 },
+      { id = "console", size = 0.2 },
     },
-    size = 10,
-    position = "bottom",
+    size = 50,
+    position = "right",
   },
 }
 
@@ -210,21 +197,9 @@ return {
             local width = vim.api.nvim_win_get_width(win)
             local height = vim.api.nvim_win_get_height(win)
 
-            -- Determine if this is the right panel (by position/width)
-            -- Right panel windows have significant width
+            -- Right panel: persist width
             if width > 20 and width < 200 then
-              -- Update right panel size
               current_layouts[1].size = width
-            end
-
-            -- Bottom panel windows have significant height
-            if height > 3 and height < 50 then
-              -- Update bottom panel size (check position)
-              local row = vim.api.nvim_win_get_position(win)[1]
-              local total_height = vim.o.lines
-              if row > total_height / 2 then
-                current_layouts[2].size = height
-              end
             end
           end
         end
@@ -261,6 +236,13 @@ return {
 
     -- listeners para abrir/cerrar automáticamente
     dap.listeners.after.event_initialized["dapui_config"] = function()
+      -- Cerrar outline si está abierto (compite por el panel derecho)
+      pcall(function()
+        local outline = require("outline")
+        if outline.is_open() then
+          outline.close()
+        end
+      end)
       -- Open dap-ui (layouts already configured in setup)
       dapui.open()
       -- Restore watches after UI is open
