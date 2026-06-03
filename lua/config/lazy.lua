@@ -45,6 +45,7 @@ require("lazy").setup({
     { import = "plugins.ai" },
     { import = "plugins.cpp" },
     { import = "plugins.dap" },
+    { import = "plugins.dart" },
     { import = "plugins.dev-tools" },
     { import = "plugins.git" },
     { import = "plugins.lsp" },
