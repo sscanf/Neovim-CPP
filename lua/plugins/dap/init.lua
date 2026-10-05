@@ -18,18 +18,73 @@ return {
 
   -- Deshabilitar la configuración de iconos de LazyVim
   opts = function()
+    -- codelldb solo escucha en IPv4 (127.0.0.1); "localhost" puede resolver a ::1
+    -- y fallar con ECONNREFUSED. Se define aquí porque el `config` de este spec
+    -- no se ejecuta (ver signs-override.lua). mason-nvim-dap lo redefine luego
+    -- sin host, y nvim-dap usa 127.0.0.1 por defecto, así que también vale.
+    require("dap").adapters.codelldb = {
+      type = "server",
+      host = "127.0.0.1",
+      port = "${port}",
+      executable = {
+        command = "codelldb",
+        args = { "--port", "${port}" },
+      },
+    }
     -- Esto previene que LazyVim sobrescriba nuestros signos
     return {}
   end,
 
   keys = {
-    { "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input('Breakpoint condition: ')) end, desc = "Breakpoint Condition" },
-    { "<leader>db", function() require("dap").toggle_breakpoint() end, desc = "Toggle Breakpoint" },
-    { "<leader>dc", function() require("dap").continue() end, desc = "Continue" },
-    { "<leader>di", function() require("dap").step_into() end, desc = "Step Into" },
-    { "<leader>do", function() require("dap").step_over() end, desc = "Step Over" },
-    { "<leader>dO", function() require("dap").step_out() end, desc = "Step Out" },
-    { "<leader>dt", function() require("dap").terminate() end, desc = "Terminate" },
+    {
+      "<leader>dB",
+      function()
+        require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+      end,
+      desc = "Breakpoint Condition",
+    },
+    {
+      "<leader>db",
+      function()
+        require("dap").toggle_breakpoint()
+      end,
+      desc = "Toggle Breakpoint",
+    },
+    {
+      "<leader>dc",
+      function()
+        require("dap").continue()
+      end,
+      desc = "Continue",
+    },
+    {
+      "<leader>di",
+      function()
+        require("dap").step_into()
+      end,
+      desc = "Step Into",
+    },
+    {
+      "<leader>do",
+      function()
+        require("dap").step_over()
+      end,
+      desc = "Step Over",
+    },
+    {
+      "<leader>dO",
+      function()
+        require("dap").step_out()
+      end,
+      desc = "Step Out",
+    },
+    {
+      "<leader>dt",
+      function()
+        require("dap").terminate()
+      end,
+      desc = "Terminate",
+    },
   },
 
   config = function()

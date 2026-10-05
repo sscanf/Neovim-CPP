@@ -13,7 +13,7 @@ This is a comprehensive Neovim configuration based on LazyVim with specialized s
 - Plugin configurations are self-contained in `lua/plugins/` organized by category:
   - `dap/` - Debug Adapter Protocol (remote debugging system)
   - `cpp/` - C/C++ development tools
-  - `ai/` - AI assistants (Copilot)
+  - `ai/` - AI assistants (Claude Code, local LLM via CodeCompanion)
   - `git/` - Git integration
   - `ui/` - UI enhancements
 
